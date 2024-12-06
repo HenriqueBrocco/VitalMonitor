@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:topicos_4/usuario_repository.dart';
 import 'db.dart';
 import 'side_menu.dart';
+import 'package:provider/provider.dart';
+import 'package:topicos_4/bluetooth_provider.dart';
 
 class Principal extends StatefulWidget {
   const Principal({super.key});
@@ -19,17 +20,34 @@ class _PrincipalState extends State<Principal> {
   var tamFonteBotoes = 50.0;
   bool isSearchBoxVisible = false;
   final searchController = TextEditingController();
-  //var recovered_data = {};
+  var oxigenacao = '';
+  var freqCard = '';
+  var pressaoSang = '';
+  bool queda = false;
 
   get items => null;
   String usuarioID = "";
   String nome = "";
   String doc = "";
 
+  bool isAlertDialogShown = false;
+
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
     _recuperarDados();
     getNome();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var bluetoothProvider = Provider.of<BluetoothProvider>(context);
+    _filtraDados(bluetoothProvider.receivedData);
+    if (queda && !isAlertDialogShown) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showAlertDialog();
+      });
+    }
 
     return Scaffold(
         extendBodyBehindAppBar: true,
@@ -130,7 +148,7 @@ class _PrincipalState extends State<Principal> {
                                                   mainAxisAlignment: MainAxisAlignment.center,
                                                   children: <Widget>[
                                                     Text(
-                                                      '75',
+                                                      freqCard.isEmpty ? '?' : freqCard,
                                                       style: TextStyle(
                                                           color: Colors.white,
                                                           fontFamily: 'Monstserrat',
@@ -213,7 +231,7 @@ class _PrincipalState extends State<Principal> {
                                                   mainAxisAlignment: MainAxisAlignment.center,
                                                   children: <Widget>[
                                                     Text(
-                                                      '98',
+                                                      oxigenacao.isEmpty ? '?' : oxigenacao,
                                                       style: TextStyle(
                                                           color: Colors.white,
                                                           fontFamily: 'Monstserrat',
@@ -296,7 +314,7 @@ class _PrincipalState extends State<Principal> {
                                                   mainAxisAlignment: MainAxisAlignment.center,
                                                   children: <Widget>[
                                                     Text(
-                                                      '12/8',
+                                                      pressaoSang.isEmpty ? '?' : pressaoSang,
                                                       style: TextStyle(
                                                           color: Colors.white,
                                                           fontFamily: 'Monstserrat',
@@ -358,8 +376,23 @@ class _PrincipalState extends State<Principal> {
                                       ]
                                   ),
                                   TextButton(
-                                    onPressed: () {
-                                    },
+                                    onPressed: () => showDialog<String>(
+                                      context: context,
+                                      builder: (BuildContext context) => AlertDialog(
+                                        title: const Text('Emergência'),
+                                        content: const Text('Deseja realizar a ligação para seu contato de emegência cadastrado?'),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(context, 'Cancelar'),
+                                            child: const Text('Cancelar'),
+                                          ),
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(context, 'Sim'),
+                                            child: const Text('Sim'),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
                                     child: Text(
                                       'Emergência',
                                       style: TextStyle(
@@ -426,5 +459,55 @@ class _PrincipalState extends State<Principal> {
     nome = usuario.getUsuarioId(0);
 
     _salvarDados();
+  }
+
+  void _filtraDados(String dado) {
+    if(dado.isNotEmpty){
+      var dados = dado.split("|");
+      oxigenacao = dados[1] == '0'? "" : dados[1];
+      freqCard = dados[3] == '0'? "" : dados[3];
+      pressaoSang = dados[5] == '0'? "" : dados[5];
+      queda = dados[7] == '0'? false : true;
+    }
+  }
+
+  void _showAlertDialog() {
+    setState(() {
+      isAlertDialogShown = true;
+    });
+
+    showDialog(
+      context: context,
+      barrierDismissible: false, // Impede que o usuário feche o diálogo clicando fora
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Alerta de Queda'),
+          content: const Text('Detectamos uma queda brusca. Deseja contatar o contato de emergência?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                setState(() {
+                  isAlertDialogShown = false;
+                  queda = false;
+                });
+              },
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () {
+                //Liga
+                Navigator.of(context).pop();
+                setState(() {
+                  isAlertDialogShown = false;
+                  queda = false;
+                });
+              },
+              child: const Text('Ligar'),
+            ),
+          ],
+        );
+      },
+    );
   }
 }

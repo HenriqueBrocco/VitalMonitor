@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'login_page.dart';
 import 'package:topicos_4/db.dart';
+import 'package:topicos_4/bluetooth_provider.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   //await HiveConfig.start();
   DB(true);
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (_) => BluetoothProvider(),
+      child:const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

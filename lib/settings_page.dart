@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_octicons/flutter_octicons.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+//import 'package:shared_preferences/shared_preferences.dart';
+import 'bluetooth_devices.dart';
 import 'login_page.dart';
+import 'main_page.dart';
 
 class Configuracoes extends StatefulWidget {
   const Configuracoes({super.key});
@@ -11,47 +12,69 @@ class Configuracoes extends StatefulWidget {
 }
 
 class _ConfiguracoesState extends State<Configuracoes> {
-  static const double espacamento = 5;
+  //Constantes
+  Color corPadrao = const Color.fromRGBO(73, 104, 141, 1);
+  var espacamento = 20.0;
+  var tamFonteTitulo = 20.0;
+  var tamFonteBotoes = 45.0;
   bool notificacoes = false;
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        title: const Text('Configurações',
-          style: TextStyle(
-            fontSize: 25,
-            color: Colors.white,
-          ),),
-        centerTitle: true,
-        backgroundColor: Colors.green,
-      ),
-      body: Container(
+    return Scaffold(body: LayoutBuilder(builder: (context, constrains) {
+      espacamento = constrains.maxHeight / 55;
+      return Container(
         decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage('assets/images/tela_login.png'),
-              fit: BoxFit.fill,
-            )),
+          image: DecorationImage(
+            image: AssetImage("assets/images/background.png"),
+            fit: BoxFit.fill,
+          ),
+        ),
         child: Align(
           alignment: Alignment.center,
           child: SizedBox(
-            width: 300,
+            width: constrains.maxWidth / 1.05,
+            height: constrains.maxHeight / 1.05,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: <Widget>[
-                const Padding(
-                  padding: EdgeInsets.all(espacamento),
-                ),
+                //Logo e texto
+                Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      SizedBox(
+                        width: constrains.maxHeight * 0.2,
+                        height: constrains.maxHeight * 0.2,
+                        child: Image.asset(
+                          "assets/images/logo.png",
+                          fit: BoxFit.cover,
+                          alignment: Alignment.center,
+                        ),
+                      ),
+                      Padding(
+                        padding: EdgeInsets.all(espacamento / 4),
+                      ),
+                      Text(
+                        "VitalMonitor",
+                        style: TextStyle(
+                            color: corPadrao,
+                            fontFamily: 'Monstserrat',
+                            fontSize: constrains.maxHeight / tamFonteTitulo,
+                            fontWeight: FontWeight.bold),
+                      ),
+                    ]),
+
+                //Campos
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    const Text(
+                    Text(
                       'Notificações: ',
-                      style: TextStyle(color: Colors.black, fontSize: 20),
+                      style: TextStyle(
+                        color: corPadrao,
+                        fontSize: constrains.maxHeight / tamFonteBotoes,
+                        fontWeight: FontWeight.w900,
+                      ),
                     ),
                     Switch(
                       value: notificacoes,
@@ -66,113 +89,94 @@ class _ConfiguracoesState extends State<Configuracoes> {
                     ),
                   ],
                 ),
-                const Padding(
-                  padding: EdgeInsets.all(espacamento),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      TextButton(
+                        onPressed: () {
+                          //scanDispositivosBT();
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) {return BluetoothScreen();},
+                            ),
+                          );
+                        },
+                        child: Text(
+                          "Conectar dispositivo BT",
+                          style: TextStyle(
+                            color: corPadrao,
+                            fontSize: constrains.maxHeight / tamFonteBotoes,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ]
                 ),
-                TextButton(
-                  onPressed: () {
-                    _removerDados();
-                    Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => const Login()));
-                  },
-                  child: const Text(
-                    "Sair",
-                    style: TextStyle(color: Colors.black, fontSize: 15),
-                  ),
+                Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => const Login(),
+                            ),
+                          );
+                        },
+                        child: Text(
+                          "Sair",
+                          style: TextStyle(
+                            color: corPadrao,
+                            fontSize: constrains.maxHeight / tamFonteBotoes,
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                    ]
                 ),
-                const Padding(
-                  padding: EdgeInsets.all(espacamento),
+
+                //Botão voltar
+                Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: <Widget>[
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          FilledButton(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => const Principal(),
+                                ),
+                              );
+                            },
+                            style: ButtonStyle(
+                              backgroundColor:
+                                  WidgetStatePropertyAll<Color>(corPadrao),
+                            ),
+                            child: Text(
+                              "Voltar",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: constrains.maxHeight / tamFonteBotoes,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ]
                 ),
               ],
             ),
           ),
         ),
-      ),
-      bottomNavigationBar: Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFF419B5B),
-        ),
-        child: BottomAppBar(
-          shape: const CircularNotchedRectangle(),
-          child: IconTheme(
-            data: IconThemeData(color: Theme.of(context).primaryColor),
-            child: Padding(
-              padding: const EdgeInsets.all(12),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      AlertDialog(
-                        title: const Text('Sinto muito'),
-                        content: const Text(
-                            'Essa tela ainda não foi habilitada para uso, devido ao fato de ser início do projeto'),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context, 'OK');
-                            },
-                            child: const Text('OK'),
-                          ),
-                        ],
-                      );
-                    },
-                    icon: const Icon(OctIcons.graph_16),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                    icon: const Icon(Icons.home),
-                  ),
-                  const SizedBox(
-                    width: 24,
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => const Configuracoes()));
-                    },
-                    icon: const Icon(Icons.settings),
-                  ),
-                  IconButton(
-                    onPressed: () {
-                      AlertDialog(
-                        title: const Text('Sinto muito'),
-                        content: const Text(
-                            'Essa tela ainda não foi habilitada para uso, devido ao fato de ser início do projeto'),
-                        actions: <Widget>[
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context, 'OK');
-                            },
-                            child: const Text('OK'),
-                          ),
-                        ],
-                      );
-                    },
-                    icon: const Icon(Icons.camera),
-                  )
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          /*Navigator.of(context).push(
-              MaterialPageRoute(builder: (context) => const Tela...()));*/
-        },
-        backgroundColor: Theme.of(context).primaryColor,
-        child: const Icon(Icons.add),
-      ),
-    );
+      );
+    }));
   }
-
-  _removerDados() async{
+/*
+  _removerDados() async {
     final usuario = await SharedPreferences.getInstance();
     usuario.remove("usuarioID");
-  }
+  }*/
 }
