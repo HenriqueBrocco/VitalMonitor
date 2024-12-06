@@ -1,16 +1,10 @@
 # VitalMonitor
 
-A new Flutter project.
+Projeto da matéria de IOT 2, da PUC MINAS, unidade Coração Eucaristico.
+Engenharia de Computação
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+O projeto se baseia em criar um dispositivo semelhante a um smartwatch, mas com o foco em questões de saúde, para manter o monitoramento do usuário via app, além de criar um rede de contatos para poder permitir que os membros da rede possam acompanhar as medições dos sensores, além disso permite que o usuário possa realizar ligações para um número de emergência. Também identifica quedas, indicando realizar a ligação para o contato de emergência.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Ainda em desenvolvimento.
